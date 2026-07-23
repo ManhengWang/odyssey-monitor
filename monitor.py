@@ -144,10 +144,24 @@ if __name__ == "__main__":
 
     if new_shows:
 
-        print("New shows found:")
-        print(new_shows)
+        good_shows = [
+            show
+            for show in new_shows
+            if "Almost Full" not in show["status"]
+        ]
 
-        send_email(new_shows)
+
+        if good_shows:
+
+            print("Good shows found:")
+            print(good_shows)
+
+            send_email(good_shows)
+
+        else:
+
+            print("New shows found, but all are almost full")
+
 
     else:
 
