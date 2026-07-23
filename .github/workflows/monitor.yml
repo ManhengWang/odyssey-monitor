@@ -12,10 +12,18 @@ jobs:
 
     runs-on: ubuntu-latest
 
+
     steps:
 
       - name: Checkout code
         uses: actions/checkout@v4
+
+
+      - name: Restore state
+        uses: actions/cache@v4
+        with:
+          path: last_seen.json
+          key: odyssey-state
 
 
       - name: Setup Python
