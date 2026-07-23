@@ -2,6 +2,7 @@ import requests
 import smtplib
 import json
 import os
+from datetime import date
 
 from bs4 import BeautifulSoup
 from email.message import EmailMessage
@@ -18,6 +19,8 @@ GMAIL_ADDRESS = "manhengwang2001@gmail.com"
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 
 STATE_FILE = "last_seen.json"
+
+END_DATE = date(2026, 9, 30)
 
 
 def get_odyssey_imax70mm():
@@ -127,7 +130,10 @@ def send_email(new_shows):
 
 
 if __name__ == "__main__":
-
+    
+    if date.today() > END_DATE:
+        print("Monitoring finished")
+        exit()
 
     shows = get_odyssey_imax70mm()
 
