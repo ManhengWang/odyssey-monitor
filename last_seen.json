@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "time": "10:00am",
+    "link": "/showtimes/143822464",
+    "status": "10:00 am UP TO 15% OFF, Almost Full"
+  },
+  {
+    "time": "2:00pm",
+    "link": "/showtimes/143822458",
+    "status": "2:00 pm UP TO 15% OFF, Almost Full"
+  },
+  {
+    "time": "6:00pm",
+    "link": "/showtimes/143822459",
+    "status": "6:00 pm Almost Full"
+  },
+  {
+    "time": "10:00pm",
+    "link": "/showtimes/143822460",
+    "status": "10:00 pm Almost Full"
+  }
+]
