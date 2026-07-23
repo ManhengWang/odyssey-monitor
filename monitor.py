@@ -1,6 +1,8 @@
 import requests
 import smtplib
+import json
 import os
+
 from bs4 import BeautifulSoup
 from email.message import EmailMessage
 
@@ -11,10 +13,11 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0"
 }
 
-
 GMAIL_ADDRESS = "manhengwang2001@gmail.com"
 
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
+
+STATE_FILE = "last_seen.json"
 
 
 def get_odyssey_imax70mm():
@@ -32,7 +35,6 @@ def get_odyssey_imax70mm():
         "html.parser"
     )
 
-
     section = soup.find(
         "li",
         attrs={
@@ -40,13 +42,11 @@ def get_odyssey_imax70mm():
         }
     )
 
-
     if not section:
         return []
 
 
     shows = []
-
 
     for button in section.find_all("a"):
 
@@ -55,36 +55,57 @@ def get_odyssey_imax70mm():
         if not time:
             continue
 
-
         shows.append(
             {
                 "time": time.text.strip(),
-                "datetime": time.get("datetime"),
                 "link": button.get("href"),
                 "status": button.get_text(" ", strip=True)
             }
         )
 
-
     return shows
 
 
 
-def send_email(shows):
+def load_previous():
+
+    if not os.path.exists(STATE_FILE):
+        return []
+
+    with open(STATE_FILE, "r") as f:
+        return json.load(f)
+
+
+
+def save_current(shows):
+
+    with open(STATE_FILE, "w") as f:
+        json.dump(
+            shows,
+            f,
+            indent=2
+        )
+
+
+
+def send_email(new_shows):
 
     msg = EmailMessage()
 
-    msg["Subject"] = "🎬 AMC The Odyssey IMAX 70MM Alert"
+    msg["Subject"] = "🎬 New AMC Odyssey IMAX 70MM Showtime"
+
     msg["From"] = GMAIL_ADDRESS
     msg["To"] = GMAIL_ADDRESS
 
 
-    body = "Found IMAX 70MM shows:\n\n"
+    body = "New IMAX 70MM showtimes found:\n\n"
 
-    for show in shows:
+
+    for show in new_shows:
+
         body += (
             f"{show['status']}\n"
-            f"{show['link']}\n\n"
+            f"https://www.amctheatres.com{show['link']}\n\n"
         )
 
 
@@ -107,12 +128,30 @@ def send_email(shows):
 
 if __name__ == "__main__":
 
+
     shows = get_odyssey_imax70mm()
 
 
-    print(shows)
+    previous = load_previous()
 
 
-    if shows:
-        send_email(shows)
-        print("Email sent!")
+    new_shows = [
+        show
+        for show in shows
+        if show not in previous
+    ]
+
+
+    if new_shows:
+
+        print("New shows found:")
+        print(new_shows)
+
+        send_email(new_shows)
+
+    else:
+
+        print("No new shows")
+
+
+    save_current(shows)
